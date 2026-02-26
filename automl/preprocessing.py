@@ -1,6 +1,7 @@
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
 from sklearn.compose import ColumnTransformer
+import pandas as pd
 
 
 def detect_problem_type(target):
@@ -14,37 +15,37 @@ def preprocess_data(df, target_col):
     X = df.drop(columns=[target_col])
     y = df[target_col]
 
-    # Detect column types
+    # 🔥 Clean text labels (optional but recommended)
+    if y.dtype == 'object':
+        y = y.astype(str).str.lower().str.strip()
+
+    # 🔥 Encode target for classification
+    label_encoder = None
+    if y.dtype == 'object':
+        label_encoder = LabelEncoder()
+        y = label_encoder.fit_transform(y)
+
+    # Detect feature types
     categorical_cols = X.select_dtypes(include=['object']).columns.tolist()
     numerical_cols = X.select_dtypes(exclude=['object']).columns.tolist()
 
     transformers = []
 
-    # Add numerical transformer if exists
     if len(numerical_cols) > 0:
-        transformers.append(
-            ("num", StandardScaler(), numerical_cols)
-        )
+        transformers.append(("num", StandardScaler(), numerical_cols))
 
-    # Add categorical transformer if exists
     if len(categorical_cols) > 0:
-        transformers.append(
-            ("cat", OneHotEncoder(handle_unknown="ignore"), categorical_cols)
-        )
+        transformers.append(("cat", OneHotEncoder(handle_unknown="ignore"), categorical_cols))
 
     preprocessor = ColumnTransformer(transformers=transformers)
 
-    # 🔥 Safe stratification handling
+    # 🔥 Safe stratification
     stratify_option = None
-
-    if y.dtype == 'object':
-        class_counts = y.value_counts()
-
-        # Only stratify if all classes have at least 2 samples
-        if class_counts.min() >= 2:
+    if len(set(y)) > 1:
+        unique, counts = pd.Series(y).value_counts().index, pd.Series(y).value_counts().values
+        if counts.min() >= 2:
             stratify_option = y
 
-    # Perform train-test split safely
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
@@ -53,4 +54,4 @@ def preprocess_data(df, target_col):
         stratify=stratify_option
     )
 
-    return preprocessor, X_train, X_test, y_train, y_test
+    return preprocessor, X_train, X_test, y_train, y_test 
