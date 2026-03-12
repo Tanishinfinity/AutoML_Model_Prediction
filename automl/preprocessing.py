@@ -1,57 +1,117 @@
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
+from sklearn.impute import SimpleImputer
 import pandas as pd
 
 
-def detect_problem_type(target):
-    if target.dtype == 'object':
+# ----------------------------------------------------
+# Detect Problem Type
+# ----------------------------------------------------
+def detect_problem_type(target_series):
+
+    if target_series.dtype == "object":
         return "classification"
-    else:
-        return "regression"
+
+    if target_series.nunique() <= 20:
+        return "classification"
+
+    return "regression"
 
 
+# ----------------------------------------------------
+# Clean Target Labels
+# ----------------------------------------------------
+def clean_target_labels(y):
+
+    y = y.astype(str)
+
+    # lowercase
+    y = y.str.lower()
+
+    # remove extra spaces
+    y = y.str.strip()
+
+    # remove multiple spaces
+    y = y.str.replace(r"\s+", " ", regex=True)
+
+    # convert invalid text to NaN
+    y = y.replace(["nan", "none", "missing"], pd.NA)
+
+    return y
+
+
+# ----------------------------------------------------
+# Preprocess Data
+# ----------------------------------------------------
 def preprocess_data(df, target_col):
+
+    # remove rows where target is missing
+    df = df.dropna(subset=[target_col])
+
     X = df.drop(columns=[target_col])
     y = df[target_col]
 
-    # 🔥 Clean text labels (optional but recommended)
-    if y.dtype == 'object':
-        y = y.astype(str).str.lower().str.strip()
+    problem_type = detect_problem_type(y)
 
-    # 🔥 Encode target for classification
-    label_encoder = None
-    if y.dtype == 'object':
+    # ----------------------------------------------------
+    # CLEAN TARGET
+    # ----------------------------------------------------
+    if problem_type == "classification":
+
+        y = clean_target_labels(y)
+
+        # remove rows where cleaning created NA
+        valid_rows = y.notna()
+
+        X = X.loc[valid_rows]
+        y = y.loc[valid_rows]
+
+        # ----------------------------------------------------
+        # ENCODE TARGET LABELS
+        # ----------------------------------------------------
         label_encoder = LabelEncoder()
         y = label_encoder.fit_transform(y)
 
-    # Detect feature types
-    categorical_cols = X.select_dtypes(include=['object']).columns.tolist()
-    numerical_cols = X.select_dtypes(exclude=['object']).columns.tolist()
+    # ----------------------------------------------------
+    # FEATURE TYPES
+    # ----------------------------------------------------
+    categorical_cols = X.select_dtypes(include=["object"]).columns
+    numeric_cols = X.select_dtypes(exclude=["object"]).columns
 
-    transformers = []
+    # ----------------------------------------------------
+    # NUMERIC PIPELINE
+    # ----------------------------------------------------
+    numeric_pipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler())
+    ])
 
-    if len(numerical_cols) > 0:
-        transformers.append(("num", StandardScaler(), numerical_cols))
+    # ----------------------------------------------------
+    # CATEGORICAL PIPELINE
+    # ----------------------------------------------------
+    categorical_pipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("encoder", OneHotEncoder(handle_unknown="ignore"))
+    ])
 
-    if len(categorical_cols) > 0:
-        transformers.append(("cat", OneHotEncoder(handle_unknown="ignore"), categorical_cols))
+    # ----------------------------------------------------
+    # COLUMN TRANSFORMER
+    # ----------------------------------------------------
+    preprocessor = ColumnTransformer([
+        ("num", numeric_pipeline, numeric_cols),
+        ("cat", categorical_pipeline, categorical_cols)
+    ])
 
-    preprocessor = ColumnTransformer(transformers=transformers)
-
-    # 🔥 Safe stratification
-    stratify_option = None
-    if len(set(y)) > 1:
-        unique, counts = pd.Series(y).value_counts().index, pd.Series(y).value_counts().values
-        if counts.min() >= 2:
-            stratify_option = y
-
+    # ----------------------------------------------------
+    # TRAIN TEST SPLIT
+    # ----------------------------------------------------
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
         test_size=0.2,
-        random_state=42,
-        stratify=stratify_option
+        random_state=42
     )
 
-    return preprocessor, X_train, X_test, y_train, y_test 
+    return preprocessor, X_train, X_test, y_train, y_test

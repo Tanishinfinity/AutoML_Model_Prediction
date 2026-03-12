@@ -1,15 +1,17 @@
+from sklearn.pipeline import Pipeline
 from automl.model_space import get_models
 from automl.optimizer import optimize_model
-from sklearn.pipeline import Pipeline
 
 
 def train_all_models(problem_type, preprocessor, X_train, y_train):
+
     models = get_models(problem_type)
 
     results = {}
 
-    for name, model in models.items():
-        score, params = optimize_model(
+    for model_name, model in models.items():
+
+        score, params, study = optimize_model(
             model,
             preprocessor,
             X_train,
@@ -17,19 +19,22 @@ def train_all_models(problem_type, preprocessor, X_train, y_train):
             problem_type
         )
 
-        results[name] = {
+        results[model_name] = {
             "score": score,
-            "params": params
+            "params": params,
+            "study": study
         }
 
     return results
 
 
-def train_final_model(best_model, preprocessor, X, y):
+def train_final_model(model, preprocessor, X_train, y_train):
+
     pipeline = Pipeline([
         ("prep", preprocessor),
-        ("model", best_model)
+        ("model", model)
     ])
 
-    pipeline.fit(X, y)
+    pipeline.fit(X_train, y_train)
+
     return pipeline

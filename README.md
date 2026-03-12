@@ -1,182 +1,115 @@
 # 🧠 AutoML Model Prediction Platform
 
-An end-to-end Automated Machine Learning (AutoML) system built with Python and Streamlit that automatically trains, optimizes, compares, and selects the best machine learning model for a given dataset.
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Framework-Streamlit-orange?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Machine Learning](https://img.shields.io/badge/Machine-Learning-brightgreen?logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![Streamlit](https://img.shields.io/badge/Framework-Streamlit-orange)
-![Machine Learning](https://img.shields.io/badge/Machine-Learning-brightgreen)
-![License](https://img.shields.io/badge/License-MIT-green)
-
----
-
-## 📌 Overview
-
-The **AutoML Model Prediction Platform** allows users to upload a CSV dataset and automatically:
-
-- Detect problem type (Classification or Regression)
-- Perform intelligent data preprocessing
-- Train multiple ML models
-- Apply Bayesian Hyperparameter Optimization using Optuna
-- Compare model performance
-- Select the best-performing model
-- Visualize performance with charts
-- Save the trained model as `.pkl`
-
-This project demonstrates practical implementation of real-world AutoML systems used in modern AI workflows.
+An end-to-end **Automated Machine Learning (AutoML)** system built with **Python and Streamlit**. This platform automates the most complex steps of the machine learning workflow, including preprocessing, problem detection, model selection, hyperparameter tuning, and deployment-ready prediction pipelines.
 
 ---
 
-## 🏗️ System Architecture
+## 📌 Project Overview
 
-```
-User Upload
-      ↓
-Data Preprocessing
-      ↓
-Model Training
-      ↓
-Bayesian Optimization
-      ↓
-Model Comparison
-      ↓
-Best Model Selection
-      ↓
-Visualization + Model Saving
-```
+The **AutoML Model Prediction Platform** simplifies the data science lifecycle. Users upload a raw dataset, and the system automatically performs validation, cleaning, feature engineering, and optimization. 
+
+The platform supports both **Classification and Regression** tasks, providing a high-level interface for users to build powerful models without writing a single line of code.
 
 ---
 
 ## 🚀 Key Features
 
-- Automated ML pipeline
-- Smart preprocessing engine (Scaling + Encoding)
-- Dynamic handling of small & imbalanced datasets
-- Bayesian hyperparameter tuning
-- Multi-model comparison (Logistic Regression, Random Forest, XGBoost)
-- Performance visualization (Bar Charts)
-- Feature importance visualization (Tree-based models)
-- Modular, production-style architecture
-- Model persistence using Joblib
-- Robust error handling
+* **End-to-End Automation:** Seamless transition from raw data to a trained model.
+* **Problem Type Detection:** Automatically identifies if the task is classification or regression.
+* **Intelligent Preprocessing:** Automatic handling of missing values, encoding categorical variables, and label normalization.
+* **Bayesian Optimization:** Uses **Optuna** for efficient hyperparameter tuning compared to traditional GridSearch.
+* **Model Leaderboard:** Trains and compares multiple models (XGBoost, Random Forest, etc.) to select the best performer.
+* **Feature Importance:** Built-in visualizations to understand which variables drive your model's decisions.
+* **Schema Alignment:** Ensures that new prediction data matches the training data format, preventing runtime errors.
+* **Model Persistence:** Save and reload your best-performing models using **Joblib**.
+
+---
+
+## 🏗 System Workflow
+
+### 1. Training Pipeline
+`Dataset Upload` → `Validation` → `Automatic Cleaning` → `Feature Engineering` → `Problem Detection` → `Model Training` → `Hyperparameter Tuning (Optuna)` → `Model Comparison` → `Best Model Selection` → `Insights Visualization`
+
+### 2. Prediction Pipeline
+`Upload Prediction CSV` → `Schema Alignment` → `Apply Stored Preprocessing` → `Run Trained Model` → `Display Results`
 
 ---
 
 ## 🛠 Tech Stack
 
-- Python 3.11  
-- Streamlit  
-- Scikit-learn  
-- Optuna  
-- XGBoost  
-- Pandas  
-- NumPy  
-- Matplotlib  
-- Joblib  
+| Technology | Purpose |
+| :--- | :--- |
+| **Python 3.11** | Core logic and programming |
+| **Streamlit** | Interactive web dashboard |
+| **Scikit-learn** | ML models and preprocessing pipelines |
+| **Optuna** | Bayesian hyperparameter optimization |
+| **XGBoost** | High-performance gradient boosting |
+| **Pandas / NumPy** | Data manipulation and processing |
+| **Matplotlib** | Model performance visualizations |
+| **Joblib** | Model and pipeline serialization |
 
 ---
 
 ## 📂 Project Structure
 
-```
+```text
 AutoML_Model_Prediction/
 │
-├── app.py
-├── requirements.txt
-├── README.md
-├── LICENSE
+├── app.py                      # Streamlit UI & main entry point
+├── requirements.txt            # Project dependencies
+├── README.md                   # Documentation
+├── LICENSE                     # MIT License
 │
-└── automl/
+└── automl/                     # Core AutoML Logic
     ├── __init__.py
-    ├── data_loader.py
-    ├── preprocessing.py
-    ├── model_space.py
-    ├── optimizer.py
-    ├── trainer.py
-    ├── evaluator.py
-    └── model_utils.py
-```
-
----
-
-## ▶️ Installation & Run
-
-### 1️⃣ Clone Repository
-
-```
-git clone https://github.com/Tanishinfinity/AutoML_Model_Prediction.git
+    ├── data_loader.py          # Data validation & ingestion
+    ├── preprocessing.py        # Automated cleaning pipelines
+    ├── feature_engineering.py  # Feature transformation logic
+    ├── model_space.py          # Model definitions & search spaces
+    ├── optimizer.py            # Optuna tuning logic
+    ├── trainer.py              # Training & comparison engine
+    ├── evaluator.py            # Performance metrics & plots
+    └── model_utils.py          # Persistence (Save/Load) logic
+▶️ Installation & Setup
+1. Clone the repository
+Bash
+git clone [https://github.com/Tanishinfinity/AutoML_Model_Prediction.git](https://github.com/Tanishinfinity/AutoML_Model_Prediction.git)
 cd AutoML_Model_Prediction
-```
-
-### 2️⃣ Install Dependencies
-
-```
+2. Install dependencies
+Bash
 pip install -r requirements.txt
-```
-
-### 3️⃣ Run Application
-
-```
+3. Run the application
+Bash
 streamlit run app.py
-```
+Access the platform in your browser at: http://localhost:8501
 
----
+📈 Example Use Cases
+Business: Customer churn prediction and sales forecasting.
 
-## 📊 Workflow
+Marketing: Sentiment analysis and engagement classification.
 
-1. Upload CSV dataset  
-2. Select target column  
-3. AutoML detects problem type  
-4. Preprocessing pipeline is built automatically  
-5. Multiple models are trained  
-6. Bayesian optimization tunes hyperparameters  
-7. Best model selected automatically  
-8. Performance visualized  
-9. Model saved for future predictions  
+Research: Rapid prototyping for academic machine learning experiments.
 
----
+Startups: Fast-tracking the MVP development for AI features.
 
-## 📈 Example Use Cases
+🔮 Future Improvements
+[ ] SHAP Explainability: Detailed instance-level model interpretation.
 
-- Sentiment classification
-- Customer churn prediction
-- Sales forecasting
-- Employee performance analysis
-- Academic ML experiments
-- Business data analytics
+[ ] NLP Pipelines: Support for raw text columns and automated vectorization.
 
----
+[ ] API Layer: Automated generation of FastAPI endpoints for models.
 
-## 🧠 What This Project Demonstrates
+[ ] Dockerization: Easy deployment via containerization.
 
-- End-to-end ML pipeline engineering
-- Automated model selection
-- Hyperparameter optimization using Bayesian methods
-- Production-style modular architecture
-- Robust dataset validation & error handling
-- Explainable ML via feature importance visualization
-
----
-
-## 🔮 Future Improvements
-
-- SHAP Explainability integration
-- Automatic NLP support (TF-IDF for text columns)
-- Confusion matrix visualization
-- REST API integration (FastAPI)
-- Deployment on Streamlit Cloud
-- Docker containerization
-
----
-
-## 📜 License
-
+📜 License
 This project is licensed under the MIT License.
 
----
+👨‍💻 Author
+Tanish Machine Learning Enthusiast | AI Developer
 
-## 👨‍💻 Author
-
-**Tanish**  
-Machine Learning Enthusiast | AI Developer  
-
-⭐ If you found this project useful, consider giving it a star!
+⭐ If you find this project useful, please consider giving it a star on GitHub!
